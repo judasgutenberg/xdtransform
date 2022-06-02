@@ -10,3 +10,9 @@ optional arguments:
   -t TRANSFORM, --transform TRANSFORM
                         The transformation XML file
 ```
+
+
+This version has some improvements over the 0.0.1 version in that it now does the deeper transforms required by MS Visual Studio configurations.
+It also handles the "InsertIfMissing" transform type, which the stock version did not.
+
+--Gus Mueller, June 2, 2022
