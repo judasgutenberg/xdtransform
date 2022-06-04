@@ -11,6 +11,7 @@ optional arguments:
                         The transformation XML file
 ```
 
+If this had been hosted in GitHub, I would've cloned it from there and even offered pull requests.  But it's in Python's module ecosystem, which I don't really understand.
 
 This version has some improvements over the 0.0.1 version in that it now does the deeper transforms required by MS Visual Studio configurations.
 It also handles the "InsertIfMissing" transform type, which the stock version did not.
