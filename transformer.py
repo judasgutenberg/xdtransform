@@ -1,3 +1,4 @@
+#uses xdtransform to transform a file and produce an output file
 import sys        
 import os    
 import shutil  
@@ -33,7 +34,7 @@ f = open(out_filename, "r")
 content = f.read()
 f.close()
 
- 
+#handles the situation where the transform produces nothing
 if content.strip() == defaultContent.strip():
   os.remove(out_filename)
   shutil.copy(source_filename, out_filename)
