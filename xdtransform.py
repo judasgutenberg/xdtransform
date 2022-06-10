@@ -59,6 +59,9 @@ locator_types = {
     "Condition": locator_condition,
     "XPath": locator_xpath,
 }
+
+
+
 transform_types = {
     "Replace": lambda v, te, se: se.getparent().replace(se, copy_element(te)),
     "Insert": lambda v, te, se: se.getparent().append(copy_element(te)),
@@ -120,40 +123,21 @@ def transform(source_file, transform_file, target_file):
     
     # Use a `set` to keep track of "visited" elements with good lookup time.
     visited = set()
-    # The iter method does a recursive traversal
-    for el in source_tree.iter('element'):
-        # Since the id is what defines a duplicate for you
-        if 'key' in el.attr:
-            current = el.get('key')
-            # In visited already means it's a duplicate, remove it
-            if current in visited:
-                el.getparent().remove(el)
-            # Otherwise mark this ID as "visited"
-            else:
-                visited.add(current)
+
     
     transformFile = lxml.etree.parse(file(transform_file))   
-    # Use a `set` to keep track of "visited" elements with good lookup time.
-    visited = set()
-    # The iter method does a recursive traversal
-    for el in transformFile.iter('element'):
-        # Since the id is what defines a duplicate for you
-        if 'key' in el.attr:
-            current = el.get('key')
-            # In visited already means it's a duplicate, remove it
-            if current in visited:
-                el.getparent().remove(el)
-            # Otherwise mark this ID as "visited"
-            else:
-                visited.add(current)
-    
-    
-    
+
+
     changed = transform_elements(
         transformFile.getroot(),
         source_tree.getroot())
         
+    #removes elements with no values: 
+    for el in source_tree.iter('add'):
+      if 'value' not in el.attrib  and  'connectionString' not in el.attrib:
+        el.getparent().remove(el)
         
+
     if changed:
         source_tree.write(
             target_file,
