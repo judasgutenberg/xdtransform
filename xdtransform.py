@@ -105,7 +105,8 @@ def transform_elements(transform_parent, source_parent):
                     changed |= transform_elements(te, se)
         if not found:
             se = copy_element(te)
-            keysHandled.append(te.attrib["key"])
+            if "key" in te.attrib["key"]:
+              keysHandled.append(te.attrib["key"])
             #print(te.attrib["key"])
             source_parent.append(se)
             transform_elements(te, se)
@@ -113,10 +114,11 @@ def transform_elements(transform_parent, source_parent):
     #for some reason elements in source are lost if not mentioned in the transform, so:
     for e in copyOfSourceParent:
       if is_element(e):
-        key = e.attrib["key"]
-        if not key in keysHandled:
-          source_parent.append(e)
-          #print(e.attrib)
+        if "key" in e.attrib["key"]:
+          key = e.attrib["key"]
+          if not key in keysHandled:
+            source_parent.append(e)
+            #print(e.attrib)
     return changed
 
 
