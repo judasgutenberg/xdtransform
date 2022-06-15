@@ -1,5 +1,6 @@
 import lxml.etree
 import re
+import copy
 
 xdt_ns = "http://schemas.microsoft.com/XML-Document-Transform"
 locator_qname = lxml.etree.QName(xdt_ns, "Locator")
@@ -81,6 +82,8 @@ def is_element(node):
 
 def transform_elements(transform_parent, source_parent):
     changed = False
+    copyOfSourceParent = copy.deepcopy(source_parent)
+    keysHandled = []
     for te in transform_parent:
         if not is_element(te):
             continue
@@ -93,6 +96,7 @@ def transform_elements(transform_parent, source_parent):
                 found = True
                 if transform_qname in te.attrib:
                     _transform = attr_regex.match(te.attrib[transform_qname]).groupdict()
+                    #print(transform_types[_transform["type"]])
                     transform_types[_transform["type"]](_transform["value"], te, se)
                     changed |= True
                     if _transform["type"] == "Remove":
@@ -101,9 +105,18 @@ def transform_elements(transform_parent, source_parent):
                     changed |= transform_elements(te, se)
         if not found:
             se = copy_element(te)
+            keysHandled.append(te.attrib["key"])
+            #print(te.attrib["key"])
             source_parent.append(se)
             transform_elements(te, se)
             changed |= True
+    #for some reason elements in source are lost if not mentioned in the transform, so:
+    for e in copyOfSourceParent:
+      if is_element(e):
+        key = e.attrib["key"]
+        if not key in keysHandled:
+          source_parent.append(e)
+          #print(e.attrib)
     return changed
 
 
@@ -119,18 +132,13 @@ def file(f, mode="rb"):
 
 def transform(source_file, transform_file, target_file):
     source_tree = lxml.etree.parse(file(source_file))
-    
-    
+
     # Use a `set` to keep track of "visited" elements with good lookup time.
     visited = set()
-
     
     transformFile = lxml.etree.parse(file(transform_file))   
 
-
-    changed = transform_elements(
-        transformFile.getroot(),
-        source_tree.getroot())
+    changed = transform_elements(transformFile.getroot(), source_tree.getroot())
         
     #removes elements with no values: 
     for el in source_tree.iter('add'):
