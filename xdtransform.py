@@ -92,6 +92,7 @@ def transform_elements(transform_parent, source_parent):
         source_elements = locator_fn(source_parent) if locator.get("type") == "XPath" else source_parent
         found = False
         for se in source_elements:
+
             if is_element(se) and ((te.tag == se.tag and locator_fn(se)) or locator.get("type") == "XPath"):
                 found = True
                 if transform_qname in te.attrib:
@@ -103,9 +104,12 @@ def transform_elements(transform_parent, source_parent):
                         break
                 else:
                     changed |= transform_elements(te, se)
+            else:
+                if "key" in se.attrib:
+                  keysHandled.append(se.attrib["key"])
         if not found:
             se = copy_element(te)
-            if "key" in te.attrib["key"]:
+            if "key" in te.attrib:
               keysHandled.append(te.attrib["key"])
             #print(te.attrib["key"])
             source_parent.append(se)
@@ -114,8 +118,9 @@ def transform_elements(transform_parent, source_parent):
     #for some reason elements in source are lost if not mentioned in the transform, so:
     for e in copyOfSourceParent:
       if is_element(e):
-        if "key" in e.attrib["key"]:
+        if "key" in e.attrib:
           key = e.attrib["key"]
+          #print(keysHandled)
           if not key in keysHandled:
             source_parent.append(e)
             #print(e.attrib)
